@@ -166,7 +166,8 @@ bool DubEchoAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* DubEchoAudioProcessor::createEditor()
 {
-    return new DubEchoAudioProcessorEditor (*this);
+   // return new DubEchoAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -188,4 +189,29 @@ void DubEchoAudioProcessor::setStateInformation (const void* data, int sizeInByt
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DubEchoAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout DubEchoAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Size",
+        "Reverb Size",juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Damping",
+        "Reverb Damping", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Dry/Wet",
+        "Reverb Dry/Wet", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Time",
+        "Delay Time", juce::NormalisableRange<float>(0.f, 2000.f, 5.f, 1.f), 200.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Feedback",
+        "DelayFeedback", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Dry/Wet",
+        "Delay Dry/Wet", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+
+    return layout;
 }
