@@ -81,7 +81,7 @@ public:
         updateDelayLineSize();
         updateDelayTime();
 
-        filterCoefs = juce::dsp::IIR:Coefficients<Type>::makeFirstOrderHighPass(sampleRate, Type(1e3));
+        filterCoefs = juce::dsp::IIR::Coefficients<Type>::makeFirstOrderHighPass(sampleRate, Type(1e3));
 
         for (auto& f : filters)
         {
@@ -111,13 +111,13 @@ public:
     {
         jassert(newValue > Type(0));
         maxDelayTime = newValue;
-        updateDelaySize();
+        updateDelayLineSize();
     }
 
     //==============================================================================
     void setFeedback(Type newValue) noexcept
     {
-        jassert(newValue >= Type(0) && newValue <= type(1));
+        jassert(newValue >= Type(0) && newValue <= Type(1));
         feedback = newValue;
     }
 
@@ -125,7 +125,7 @@ public:
     void setWetLevel(Type newValue) noexcept
     {
         jassert(newValue >= Type(0) && newValue <= Type(1));
-        wetLevel = newValue
+        wetLevel = newValue;
     }
 
     //==============================================================================
@@ -193,7 +193,7 @@ private:
     //==============================================================================
     void updateDelayLineSize()
     {
-        auto delayLineSizeSamples = (size_t)std::ceil(maxDelauTime * sampleRate);
+        auto delayLineSizeSamples = (size_t)std::ceil(maxDelayTime * sampleRate);
 
         for (auto& dline : delayLines)
         {
@@ -205,10 +205,18 @@ private:
     void updateDelayTime() noexcept
     {
         for (size_t ch = 0; ch < maxNumChannels; ++ch)
-            delayTimeSample[ch] = (size_t)juce::roundToInt(delayTimes[ch] * sampleRate);
+            delayTimesSample[ch] = (size_t)juce::roundToInt(delayTimes[ch] * sampleRate);
     }
 };
 
+struct ChainSettings
+{
+    float reverbSize{ 50 }, reverbDamping{ 50 }, reverbWet{ 0 };
+    float delayTime{ 200 }, delayFeedBack{ 0 }, delayWet{ 0 };
+};
+
+
+using MonoChain = juce::dsp::ProcessorChain<juce::dsp::Reverb, Delay<float>>;
 
 //==============================================================================
 class DubEchoAudioProcessor  : public juce::AudioProcessor
@@ -259,6 +267,7 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 private:
+    MonoChain leftChain, rightChain;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubEchoAudioProcessor)
 };
