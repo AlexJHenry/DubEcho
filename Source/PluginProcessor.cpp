@@ -101,6 +101,7 @@ void DubEchoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     spec.numChannels = 1;
     spec.sampleRate = sampleRate;
 
+    updateFXChain();
     leftChain.prepare(spec);
     rightChain.prepare(spec);
 }
@@ -151,7 +152,8 @@ void DubEchoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
+    
+    updateFXChain();
     juce::dsp::AudioBlock<float> block(buffer);
 
     auto leftBlock = block.getSingleChannelBlock(0);
@@ -223,22 +225,61 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubEchoAudioProcessor::creat
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Size",
-        "Reverb Size",juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+        "Reverb Size",juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Damping",
-        "Reverb Damping", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+        "Reverb Damping", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Reverb Dry/Wet",
-        "Reverb Dry/Wet", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+        "Reverb Dry/Wet", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Time",
-        "Delay Time", juce::NormalisableRange<float>(0.f, 2000.f, 5.f, 1.f), 200.f));
+        "Delay Time", juce::NormalisableRange<float>(0.f, 2.f, 0.01f, 1.f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Feedback",
-        "DelayFeedback", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+        "DelayFeedback", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Delay Dry/Wet",
-        "Delay Dry/Wet", juce::NormalisableRange<float>(0.f, 100.f, 0.5f, 1.f), 50.f));
+        "Delay Dry/Wet", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 0.5f));
 
     return layout;
+}
+void DubEchoAudioProcessor::updateFXChain()
+{
+    auto settings = getChainSettings(apvts);
+    updateDelay(settings);
+    updateReverb(settings);
+}
+
+void DubEchoAudioProcessor::updateDelay(ChainSettings& settings)
+{
+
+    auto& leftDelay = leftChain.get<ChainPositions::delay>();
+    auto& rightDelay = rightChain.get<ChainPositions::delay>();
+
+    leftDelay.setDelayTime(0, settings.delayTime);
+    leftDelay.setDelayTime(1, settings.delayTime);
+    leftDelay.setFeedback(settings.delayFeedBack);
+    leftDelay.setWetLevel(settings.delayWet);
+
+    rightDelay.setDelayTime(0, settings.delayTime);
+    rightDelay.setDelayTime(1, settings.delayTime);
+    rightDelay.setFeedback(settings.delayFeedBack);
+    rightDelay.setWetLevel(settings.delayWet);
+
+}
+
+void DubEchoAudioProcessor::updateReverb(ChainSettings& settings)
+{
+    auto& leftReverb = leftChain.get<ChainPositions::reverb>();
+    auto& rightReverb = rightChain.get<ChainPositions::reverb>();
+
+    auto parameters = leftReverb.getParameters();
+    parameters.wetLevel = settings.reverbWet;
+    parameters.damping = settings.reverbDamping;
+    parameters.dryLevel = 1.f - parameters.wetLevel;
+    parameters.roomSize = settings.reverbSize;
+
+    leftReverb.setParameters(parameters);
+    rightReverb.setParameters(parameters);
 }

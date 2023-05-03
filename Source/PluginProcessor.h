@@ -66,7 +66,7 @@ public:
     //==============================================================================
     Delay()
     {
-        setMaxDelayTime(2.0f);
+        setMaxDelayTime(2.1f);
         setDelayTime(0, 0.7f);
         setDelayTime(1, 0.5f);
         setWetLevel(0.5f);
@@ -208,13 +208,17 @@ private:
             delayTimesSample[ch] = (size_t)juce::roundToInt(delayTimes[ch] * sampleRate);
     }
 };
+enum ChainPositions
+{
+    reverb,
+    delay,
+};
 
 struct ChainSettings
 {
-    float reverbSize{ 50 }, reverbDamping{ 50 }, reverbWet{ 0 };
-    float delayTime{ 200 }, delayFeedBack{ 0 }, delayWet{ 0 };
+    float reverbSize{ 0.5f }, reverbDamping{ 0.5f }, reverbWet{ 0.5f };
+    float delayTime{ 0.5f }, delayFeedBack{ 0.5f }, delayWet{ 0 };
 };
-
 
 using MonoChain = juce::dsp::ProcessorChain<juce::dsp::Reverb, Delay<float>>;
 
@@ -269,5 +273,8 @@ public:
 private:
     MonoChain leftChain, rightChain;
     //==============================================================================
+    void updateFXChain();
+    void updateDelay(ChainSettings& settings);
+    void updateReverb(ChainSettings& settings);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubEchoAudioProcessor)
 };
