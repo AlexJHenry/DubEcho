@@ -5,7 +5,7 @@
     <PLUGIN name="Audio Input" descriptiveName="" format="Internal" category="I/O devices"
             manufacturer="JUCE" version="1.0" file="" uniqueId="246006c0"
             isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="0"
-            numOutputs="2" isShell="0" hasARAExtension="0" uid="246006c0"/>
+            numOutputs="8" isShell="0" hasARAExtension="0" uid="246006c0"/>
     <STATE>0.</STATE>
     <LAYOUT>
       <INPUTS>
@@ -39,7 +39,7 @@
     <STATE>0.</STATE>
     <LAYOUT>
       <INPUTS>
-        <BUS index="0" layout="L R"/>
+        <BUS index="0" layout="L R C Lfe Lss Rss Lrs Rrs"/>
       </INPUTS>
       <OUTPUTS>
         <BUS index="0" layout="disabled"/>
@@ -61,14 +61,28 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="5" x="0.5802139037433155" y="0.5576496674057649" useARA="0"
-          uiLastX_Normal="849" uiLastY_Normal="345" uiopen_Normal="0">
+  <FILTER uid="5" x="0.445" y="0.3629032258064516" useARA="0" uiLastX_Normal="7"
+          uiLastY_Normal="364" uiopen_Normal="1">
+    <PLUGIN name="SamplerPlugin" format="Internal" category="Synth" manufacturer="JUCE"
+            version="1.0.0" file="SamplerPlugin" uniqueId="2a34a53b" isInstrument="1"
+            fileTime="0" infoUpdateTime="0" numInputs="0" numOutputs="2"
+            isShell="0" hasARAExtension="0" uid="2a34a53b"/>
+    <STATE>0.</STATE>
+    <LAYOUT>
+      <INPUTS/>
+      <OUTPUTS>
+        <BUS index="0" layout="L R"/>
+      </OUTPUTS>
+    </LAYOUT>
+  </FILTER>
+  <FILTER uid="6" x="0.45" y="0.6229838709677419" useARA="0" uiLastX_Normal="101"
+          uiLastY_Normal="188" uiopen_Normal="0">
     <PLUGIN name="DubEcho" format="VST3" category="Fx" manufacturer="yourcompany"
-            version="1.0.0" file="C:\Users\Alex\Programming\Own\DubEcho\Builds\VisualStudio2022\x64\Debug\VST3\DubEcho.vst3"
-            uniqueId="f8aadf29" isInstrument="0" fileTime="18655a34080" infoUpdateTime="18655ab538f"
+            version="1.0.0" file="C:\Users\Alex\DubEcho\Builds\VisualStudio2022\x64\Debug\VST3\DubEcho.vst3"
+            uniqueId="f8aadf29" isInstrument="0" fileTime="188201aca9f" infoUpdateTime="1882026e587"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e9565977"/>
-    <STATE>576.VMjLgbi....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9LCM33BTEwlXmAiUYoWUrIVdA4hKAgkKTETRUAUSAAkKBolQY4BQ1MTQPQUVxUjUjYFTpIFM3fWUqE0QtDSQFEFLUYjKAolKA4hKt3hKt3hKIEDQt.UQpQUPvPjKAgDTZoVPP4BTT4RTqcmUXQSPnE0ZUYTVnUTLXEWPlM1Y2Y0XqEDTtjDTt3hKt3hKt3BTR4RPtPUPIUETMEDTtHjZFkkKD4xPEAEUYIWQVQlYPUkVyUkQtDSQFEFLUYjKAolKA4hKt3hKt3hVtHDQt.UQpQUPvPjKAgDTZoVPP4BTTYFUqk0UYgWRFgDQEYUX1sFag0VPlM1Y2Y0XqEDTtjDTt3hKt3hKt3BTR4RPtPUPIUETMEDTtHjZFkkKD4BQEgTUYESUrIFZAITT3slLKcUUFMlKXcEVxU0UY4BQPIDQt3hKt3hKt3hZDAkKtTETRUDUS4BQl4xaQYjKAoGTAIUUrM1ZI0FVlwTUZUSUF4RLEYTXvTkQtDjZtDjKt3hKt3hKtjUPD4hKt3hKt3hKt3hKlIUUMQUTPkzUZESQFM1ZQQEV5UjQtDDQlAEMAcEV40zQtDDQ14hK5EjKt3hKt3hKt3hRUACTEEzZh8VVWgkdUYTTmE0UXwyKIMzasA2atUlaz4COuX0TTMCTrU2Yo41TzEFck4C.</STATE>
+    <STATE>576.VMjLgbi....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9LCM33BTEwlXmAiUYoWUrIVdA4hKAgkKTETRUAUSAAkKBolQY4BQ1MTQPQUVxUjUjYFTpIFM3fWUqE0QtDSQFEFLUYjKAolKA4hKt3hKt3hKlsxPt.UQpQUPvPjKAgDTZoVPP4BTT4RTqcmUXQSPnE0ZUYTVnUTLXEWPlM1Y2Y0XqEDTtjDTt3hKt3hKt3hKyrhKtPUPIUETMEDTtHjZFkkKD4xPEAEUYIWQVQlYPUkVyUkQtDSQFEFLUYjKAolKA4hKt3hYBc0SwrxPt.UQpQUPvPjKAgDTZoVPP4BTTYFUqk0UYgWRFgDQEYUX1sFag0VPlM1Y2Y0XqEDTtjDTt3hKt3hKt3hKyrhKtPUPIUETMEDTtHjZFkkKD4BQEgTUYESUrIFZAITT3slLKcUUFMlKXcEVxU0UY4BQPIDQt3hKt3hKt3hK47jKtTETRUDUS4BQl4xaQYjKAoGTAIUUrM1ZI0FVlwTUZUSUF4RLEYTXvTkQtDjZtDjKt3hKt3hKtX1JC4hKt3hKt3hKt3hKlIUUMQUTPkzUZESQFM1ZQQEV5UjQtDDQlAEMAcEV40zQtDDQ14hK5EjKt3hKt3hKt3hRUACTEEzZh8VVWgkdUYTTmE0UXwyKIMzasA2atUlaz4COuX0TTMCTrU2Yo41TzEFck4C.</STATE>
     <LAYOUT>
       <INPUTS>
         <BUS index="0" layout="L R"/>
@@ -78,24 +92,9 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="6" x="0.5748663101604278" y="0.3869179600886918" useARA="0"
-          uiLastX_Normal="238" uiLastY_Normal="373" uiopen_Normal="0">
-    <PLUGIN name="AASamplePlayer" format="VST3" category="Instrument|Sampler"
-            manufacturer="GAS Therapy" version="1.0.6" file="C:\Program Files\VSTplugins\AASamplePlayer_v1.0.6_win64_VST3\AASamplePlayer.vst3"
-            uniqueId="46a57d02" isInstrument="1" fileTime="184717e25bc" infoUpdateTime="18655ab5390"
-            numInputs="0" numOutputs="2" isShell="0" hasARAExtension="0"
-            uid="828cfc9e"/>
-    <STATE>612.VMjLgrk....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9LyM03BTEwlXmAiUYoWUrIVdAAkKBwjUigWRWkEcQ0VTucmUY4TQVE1ZAAkKWQkcUc1cFEFMAgGU5kzUjEWPRsjYhU0X0QCdicVVG4RZU0lX3UEagoWVTokbUYDUmE0QZ4BQPQUQXYkVxUEaNU2M3szPUgGSAgiTUkWUrIVd3HETxUkQjUmdTMVdqECV0A0ZhcVSwnUd3flXmMlLWw1ZFE1ZMIyRPUjUZoFN3U0Y2YTXzTEZLYGSEMFdqIiVqgzPLMGUnwjchU0X0QCdicVVG4RPP4BUAkTUP0TPP4hPpYTVtPjKBUDQDUEUEoGTKEjYic1cVM1ZAAkKIAkKt3hKt.0YwczXq3hKTETRUAUSAAkKBolQY4BQ1ETQtTkTT0DQR4BVWgkbUcUVtPDTBQjKt3hKt3hKt3hKt3hKUAkTEQ0TtPjYt7VTF4RPpAUPRUEQSUTQ5QUQAY1XmcmUisVPP4RRP4hKt3hKt3hKtHjKA4BUAkTUP0TPP4hPpYTVtPjKCUDSEUUPIUTUPgCUR4TTE4RLEYTXvTkQtDjZtDjKt3hKt3hKt3hKt3hKt3hKt3hKt3hKlIUUMQUTPkzUZESQFM1ZQQEV5UjQtDDQlAEMAcEV40zQtDDQ14hK5EjKt3hKt3hKt3hRUACTEEzZh8VVWgkdUYTTmE0UXwyKIMzasA2atUlaz4COuX0TTMCTrU2Yo41TzEFck4C.</STATE>
-    <LAYOUT>
-      <INPUTS/>
-      <OUTPUTS>
-        <BUS index="0" layout="L R"/>
-      </OUTPUTS>
-    </LAYOUT>
-  </FILTER>
-  <CONNECTION srcFilter="2" srcChannel="4096" dstFilter="6" dstChannel="4096"/>
-  <CONNECTION srcFilter="5" srcChannel="0" dstFilter="3" dstChannel="0"/>
-  <CONNECTION srcFilter="5" srcChannel="1" dstFilter="3" dstChannel="1"/>
-  <CONNECTION srcFilter="6" srcChannel="0" dstFilter="5" dstChannel="0"/>
-  <CONNECTION srcFilter="6" srcChannel="1" dstFilter="5" dstChannel="1"/>
+  <CONNECTION srcFilter="2" srcChannel="4096" dstFilter="5" dstChannel="4096"/>
+  <CONNECTION srcFilter="5" srcChannel="0" dstFilter="6" dstChannel="0"/>
+  <CONNECTION srcFilter="5" srcChannel="1" dstFilter="6" dstChannel="1"/>
+  <CONNECTION srcFilter="6" srcChannel="0" dstFilter="3" dstChannel="1"/>
+  <CONNECTION srcFilter="6" srcChannel="1" dstFilter="3" dstChannel="2"/>
 </FILTERGRAPH>

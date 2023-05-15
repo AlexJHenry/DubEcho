@@ -11,6 +11,25 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+
+
+class LookAndFeel : public juce::LookAndFeel_V4
+{
+
+public:
+    LookAndFeel()
+    {
+        setColour(juce::Slider::thumbColourId, juce::Colours::red);
+    }
+
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override;
+
+};
 //==============================================================================
 /**
 */
@@ -29,5 +48,12 @@ private:
     // access the processor object that created it.
     DubEchoAudioProcessor& audioProcessor;
 
+    juce::Slider delayTime;
+    juce::Slider delayFeedBack;
+    juce::Slider delayWet;
+    juce::Slider reverbSize;
+    juce::Slider reverbDamping;
+    juce::Slider reverbWet;
+    LookAndFeel lnf;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubEchoAudioProcessorEditor)
 };

@@ -174,8 +174,7 @@ bool DubEchoAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* DubEchoAudioProcessor::createEditor()
 {
-   // return new DubEchoAudioProcessorEditor (*this);
-    return new juce::GenericAudioProcessorEditor(*this);
+   return new DubEchoAudioProcessorEditor (*this);
 }
 
 //==============================================================================
