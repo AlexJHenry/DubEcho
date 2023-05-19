@@ -11,35 +11,33 @@
 
 //==============================================================================
 DubEchoAudioProcessorEditor::DubEchoAudioProcessorEditor (DubEchoAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p),
+    delayTimeSlider(*audioProcessor.apvts.getParameter("Delay Time"), ""),
+    delayFeedBackSlider(*audioProcessor.apvts.getParameter("Delay Feedback"), ""),
+    delayWetSlider(*audioProcessor.apvts.getParameter("Delay Dry/Wet"), ""),
+    reverbSizeSlider(*audioProcessor.apvts.getParameter("Reverb Damping"), ""),
+    reverbDampingSlider(*audioProcessor.apvts.getParameter("Reverb Size"), ""),
+    reverbWetSlider(*audioProcessor.apvts.getParameter("Reverb Dry/Wet"), ""),
+
+    delayTimeSliderAttachment(audioProcessor.apvts, "Delay Time", delayTimeSlider),
+    delayFeedBackSliderAttachment(audioProcessor.apvts, "Delay Feedback", delayFeedBackSlider),
+    delayWetSliderAttachment(audioProcessor.apvts, "Delay Dry/Wet", delayWetSlider),
+    reverbSizeSliderAttachment(audioProcessor.apvts, "Reverb Size", reverbSizeSlider),
+    reverbDampingSliderAttachment(audioProcessor.apvts, "Reverb Damping", reverbDampingSlider),
+    reverbWetSliderAttachment(audioProcessor.apvts, "Reverb Dry/Wet", reverbWetSlider),
+
+    verticalDiscreteMeterL([&]() { return audioProcessor.getRmsValue(0); }),
+    verticalDiscreteMeterR([&]() { return audioProcessor.getRmsValue(1); })
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setLookAndFeel(&lnf);
-    
-    delayTime.setSliderStyle(juce::Slider::Rotary);
-    delayTime.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(delayTime);
+    //delayTimeSlider.labels.add({ 0.f }, "10 mS");
+    //delayTimeSlider.labels.add({ 1.f }, "2000 mS");
 
-    delayWet.setSliderStyle(juce::Slider::Rotary);
-    delayWet.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(delayWet);
-
-    delayFeedBack.setSliderStyle(juce::Slider::Rotary);
-    delayFeedBack.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(delayFeedBack);
-
-    reverbSize.setSliderStyle(juce::Slider::Rotary);
-    reverbSize.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(reverbSize);
-
-    reverbDamping.setSliderStyle(juce::Slider::Rotary);
-    reverbDamping.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(reverbDamping);
-
-    reverbWet.setSliderStyle(juce::Slider::Rotary);
-    reverbWet.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    addAndMakeVisible(reverbWet);
+    for (auto* comp : getComps())
+    {
+        addAndMakeVisible(comp);
+    }
     setSize (400, 300);
 }
 
@@ -51,7 +49,17 @@ DubEchoAudioProcessorEditor::~DubEchoAudioProcessorEditor()
 //==============================================================================
 void DubEchoAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::lightgrey);
+    using namespace juce;
+    g.fillAll(Colours::ivory);
+
+    g.drawFittedText("Time", delayTimeSlider.getBounds(), juce::Justification::centredBottom, 1);
+    g.drawFittedText("FeedBack", delayFeedBackSlider.getBounds(), juce::Justification::centredBottom, 1);
+    g.drawFittedText("Dry/Wet", delayWetSlider.getBounds(), juce::Justification::centredBottom, 1);
+
+    g.drawFittedText("Size", reverbSizeSlider.getBounds(), juce::Justification::centredBottom, 1);
+    g.drawFittedText("Damping", reverbDampingSlider.getBounds(), juce::Justification::centredBottom, 1);
+    g.drawFittedText("Dry/Wet", reverbWetSlider.getBounds(), juce::Justification::centredBottom, 1);
+
 }
 
 void DubEchoAudioProcessorEditor::resized()
@@ -62,41 +70,170 @@ void DubEchoAudioProcessorEditor::resized()
 
     auto area = getLocalBounds();
 
+    auto meterBounds = area.removeFromRight(area.getWidth() / 6);
+    verticalDiscreteMeterL.setBounds(meterBounds.removeFromRight(meterBounds.getWidth() / 2).reduced(border));
+    verticalDiscreteMeterR.setBounds(meterBounds.reduced(border));
+
     auto delayArea = area.removeFromTop(area.getHeight() / 2);
-    delayTime.setBounds(delayArea.removeFromLeft(delayArea.getWidth() / 3).reduced(border));
-    delayFeedBack.setBounds(delayArea.removeFromLeft(delayArea.getWidth() / 2).reduced(border));
-    delayWet.setBounds(delayArea.reduced(border));
+    delayTimeSlider.setBounds(delayArea.removeFromLeft(delayArea.getWidth() / 3).reduced(border));
+    delayFeedBackSlider.setBounds(delayArea.removeFromLeft(delayArea.getWidth() / 2).reduced(border));
+    delayWetSlider.setBounds(delayArea.reduced(border));
 
     auto reverbArea = area;
-    reverbSize.setBounds(reverbArea.removeFromLeft(reverbArea.getWidth() / 3).reduced(border));
-    reverbDamping.setBounds(reverbArea.removeFromLeft(reverbArea.getWidth() / 2).reduced(border));
-    reverbWet.setBounds(reverbArea.reduced(border));
+    reverbSizeSlider.setBounds(reverbArea.removeFromLeft(reverbArea.getWidth() / 3).reduced(border));
+    reverbDampingSlider.setBounds(reverbArea.removeFromLeft(reverbArea.getWidth() / 2).reduced(border));
+    reverbWetSlider.setBounds(reverbArea.reduced(border));
 }
 
-void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider&)
+std::vector<juce::Component*> DubEchoAudioProcessorEditor::getComps()
+{
+    return
+    {
+        &delayTimeSlider,
+        &delayFeedBackSlider,
+        &delayWetSlider,
+        &reverbSizeSlider,
+        &reverbDampingSlider,
+        &reverbWetSlider,
+
+        &verticalDiscreteMeterL,
+        &verticalDiscreteMeterR
+    };
+}
+
+
+void LookAndFeel::drawRotarySlider(juce::Graphics& g,
+    int x,
+    int y,
+    int width,
+    int height,
+    float sliderPosProportional,
+    float rotaryStartAngle,
+    float rotaryEndAngle,
+    juce::Slider& slider)
 {
     using namespace juce;
 
-    auto radius = (float) jmin(width / 2, height / 2) - 4.0f;
-    auto centreX = (float)x + (float) width * 0.5f;
-    auto centreY = (float)y + (float) height * 0.5f;
-    auto rx = centreX - radius;
-    auto ry = centreY - radius;
-    auto rw = radius * 2.0f;
-    auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    auto bounds = Rectangle<float>(x, y, width, height);
 
-    g.setColour(Colours::orange);
-    g.fillEllipse(rx, ry, rw, rw);
+    auto enabled = slider.isEnabled();
 
-    g.setColour(Colours::red);
-    g.drawEllipse(rx, ry, rw, rw, 1.0f);
+    g.setColour(enabled ? Colours::black : Colours::darkgrey);
+    g.fillEllipse(bounds);
 
-    juce::Path p;
-    auto pointerLength = radius * 0.33f;
-    auto pointerThickness = 2.0f;
-    p.addRectangle(-pointerThickness * 0.5f, -radius, pointerThickness, pointerLength);
-    p.applyTransform(AffineTransform::rotation(angle).translated (centreX, centreY));
+    g.setColour(enabled ? Colours::lightgrey : Colours::grey);
+    g.drawEllipse(bounds, 2.f);
 
-    g.setColour(Colours::yellow);
-    g.fillPath(p);
+    if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
+    {
+        auto center = bounds.getCentre();
+        Path p;
+
+        Rectangle<float> r;
+        r.setLeft(center.getX() - 2);
+        r.setRight(center.getX() + 2);
+        r.setTop(bounds.getY());
+        r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);
+
+        p.addRoundedRectangle(r, 2.f);
+
+        jassert(rotaryStartAngle < rotaryEndAngle);
+
+        auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
+
+        p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
+
+        g.fillPath(p);
+
+        g.setFont(rswl->getTextHeight());
+        auto text = rswl->getDisplayString();
+        auto strWidth = g.getCurrentFont().getStringWidth(text);
+
+        r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
+        r.setCentre(bounds.getCentre());
+
+        g.setColour(enabled ? Colours::black : Colours::darkgrey);
+        g.fillRect(r);
+
+        g.setColour(enabled ? Colours::white : Colours::lightgrey);
+        g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+    }
 }
+
+void RotarySliderWithLabels::paint(juce::Graphics& g)
+{
+    using namespace juce;
+
+    auto startAng = degreesToRadians(180.f + 45.f);
+    auto endAng = degreesToRadians(180.f - 45.f) + MathConstants<float>::twoPi;
+    auto range = getRange();
+
+    auto sliderBounds = getSliderBounds();
+
+    getLookAndFeel().drawRotarySlider(g,
+        sliderBounds.getX(),
+        sliderBounds.getY(),
+        sliderBounds.getWidth(),
+        sliderBounds.getHeight(),
+        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0),
+        startAng,
+        endAng,
+        *this);
+
+    auto center = sliderBounds.toFloat().getCentre();
+    auto radius = sliderBounds.getWidth() * 0.5f;
+
+    g.setColour(Colour(0u, 172u, 1u));
+    g.setFont(getTextHeight());
+
+    auto numChoices = labels.size();
+    for (int i = 0; i < numChoices; ++i)
+    {
+        auto pos = labels[i].pos;
+        jassert(0.f <= pos);
+        jassert(pos <= 1.f);
+
+        auto ang = jmap(pos, 0.f, 1.f, startAng, endAng);
+
+        auto c = center.getPointOnCircumference(radius + getTextHeight() * 0.5f + 1, ang);
+
+        Rectangle<float> r;
+        auto str = labels[i].label;
+        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());
+        r.setCentre(c);
+        r.setY(r.getY() + getTextHeight());
+
+        g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
+    }
+}
+
+juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
+{
+    auto bounds = getLocalBounds();
+
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
+
+    size -= getTextHeight() * 2;
+    juce::Rectangle<int> r;
+    r.setSize(size, size);
+    r.setCentre(bounds.getCentreX(), 0);
+    r.setY(2);
+
+    return r;
+}
+
+juce::String RotarySliderWithLabels::getDisplayString() const
+{
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param))
+        return choiceParam->getCurrentChoiceName();
+
+    juce::String str;
+
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param))
+    {
+        float val = getValue();
+        str = juce::String(val);
+    }
+    return str;
+}
+

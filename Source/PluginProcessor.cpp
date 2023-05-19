@@ -102,6 +102,12 @@ void DubEchoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     spec.sampleRate = sampleRate;
 
     updateFXChain();
+
+    rmsLevelLeft.reset(sampleRate, 0.2);
+    rmsLevelRight.reset(sampleRate, 0.2);
+    rmsLevelLeft.setCurrentAndTargetValue(-100.f);
+    rmsLevelRight.setCurrentAndTargetValue(-100.f);
+
     leftChain.prepare(spec);
     rightChain.prepare(spec);
 }
@@ -161,6 +167,9 @@ void DubEchoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+
+
+    updateRmsVal(buffer);
 
     leftChain.process(leftContext);
     rightChain.process(rightContext);
@@ -243,6 +252,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubEchoAudioProcessor::creat
 
     return layout;
 }
+float DubEchoAudioProcessor::getRmsValue(const int channel) const
+{
+    jassert(channel == 0 || channel == 1);
+    if (channel == 0)
+        return rmsLevelLeft.getCurrentValue();
+    if (channel == 1)
+        return rmsLevelRight.getCurrentValue();
+    return 0.f;
+}
+void DubEchoAudioProcessor::updateRmsVal(juce::AudioBuffer<float>& buffer)
+{
+    juce::ScopedNoDenormals noDenormals;
+    const auto numSamples = buffer.getNumSamples();
+    rmsLevelLeft.skip(numSamples);
+    rmsLevelRight.skip(numSamples);
+    {
+        const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples));
+        if (value < rmsLevelLeft.getCurrentValue())
+            rmsLevelLeft.setTargetValue(value);
+        else
+            rmsLevelLeft.setCurrentAndTargetValue(value);
+    }
+
+    {
+        const auto value = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples));
+        if (value < rmsLevelRight.getCurrentValue())
+            rmsLevelRight.setTargetValue(value);
+        else
+            rmsLevelRight.setCurrentAndTargetValue(value);
+    }
+}
+
 void DubEchoAudioProcessor::updateFXChain()
 {
     auto settings = getChainSettings(apvts);

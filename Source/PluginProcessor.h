@@ -270,9 +270,14 @@ public:
     // Creates a layout containing all the delay and reverb parameters
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+
+    float getRmsValue(const int channel) const;
+    
 private:
     MonoChain leftChain, rightChain;
+    juce::LinearSmoothedValue<float> rmsLevelLeft, rmsLevelRight;
     //==============================================================================
+    void updateRmsVal(juce::AudioBuffer<float>& buffer);
     void updateFXChain();
     void updateDelay(ChainSettings& settings);
     void updateReverb(ChainSettings& settings);

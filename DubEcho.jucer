@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="nhE354" name="DubEcho">
     <GROUP id="{881FA428-47F4-1B57-2B6D-8222DBFB07BD}" name="Source">
+      <GROUP id="{309F28DA-785A-9F98-BB8C-4A948BE8CB77}" name="Component">
+        <FILE id="nqBmr5" name="VerticalDiscreteMeter.h" compile="0" resource="0"
+              file="Source/VerticalDiscreteMeter.h"/>
+      </GROUP>
       <FILE id="V6P3fh" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="rVLJl2" name="PluginProcessor.h" compile="0" resource="0"

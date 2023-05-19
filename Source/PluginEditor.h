@@ -10,18 +10,11 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "VerticalDiscreteMeter.h"
 
 
-
-class LookAndFeel : public juce::LookAndFeel_V4
-{
-
-public:
-    LookAndFeel()
-    {
-        setColour(juce::Slider::thumbColourId, juce::Colours::red);
-    }
-
+struct LookAndFeel : juce::LookAndFeel_V4
+{ 
     void drawRotarySlider(juce::Graphics&,
         int x, int y, int width, int height,
         float sliderPosProportional,
@@ -30,16 +23,52 @@ public:
         juce::Slider&) override;
 
 };
+
+struct RotarySliderWithLabels : juce::Slider
+{
+    RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) :
+        juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
+            juce::Slider::TextEntryBoxPosition::NoTextBox),
+        param(&rap),
+        suffix(unitSuffix)
+    {
+        setLookAndFeel(&lnf);
+    }
+
+    ~RotarySliderWithLabels()
+    {
+        setLookAndFeel(nullptr);
+    }
+
+    struct LabelPos
+    {
+        float pos;
+        juce::String label;
+    };
+
+    juce::Array<LabelPos> labels;
+
+    void paint(juce::Graphics& g) override;
+    juce::Rectangle<int> getSliderBounds() const;
+    int getTextHeight() const { return 14; }
+    juce::String getDisplayString() const;
+
+private:
+    LookAndFeel lnf;
+    juce::RangedAudioParameter* param;
+    juce::String suffix;
+};
 //==============================================================================
 /**
 */
-class DubEchoAudioProcessorEditor  : public juce::AudioProcessorEditor
+class DubEchoAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
     DubEchoAudioProcessorEditor (DubEchoAudioProcessor&);
     ~DubEchoAudioProcessorEditor() override;
 
     //==============================================================================
+
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -48,12 +77,26 @@ private:
     // access the processor object that created it.
     DubEchoAudioProcessor& audioProcessor;
 
-    juce::Slider delayTime;
-    juce::Slider delayFeedBack;
-    juce::Slider delayWet;
-    juce::Slider reverbSize;
-    juce::Slider reverbDamping;
-    juce::Slider reverbWet;
+    RotarySliderWithLabels delayTimeSlider,
+        delayFeedBackSlider,
+        delayWetSlider,
+        reverbSizeSlider,
+        reverbDampingSlider,
+        reverbWetSlider;
+
+    using APVTS = juce::AudioProcessorValueTreeState;
+    using Attachment = APVTS::SliderAttachment;
+
+    Attachment delayTimeSliderAttachment,
+        delayFeedBackSliderAttachment,
+        delayWetSliderAttachment,
+        reverbSizeSliderAttachment,
+        reverbDampingSliderAttachment,
+        reverbWetSliderAttachment;
+
+    std::vector<juce::Component*> getComps();
+
+    GUI::VerticalDiscreteMeter verticalDiscreteMeterL, verticalDiscreteMeterR;
     LookAndFeel lnf;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubEchoAudioProcessorEditor)
 };
